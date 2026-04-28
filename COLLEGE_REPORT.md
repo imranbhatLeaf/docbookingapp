@@ -88,5 +88,5 @@ Configured `.gitignore` to protect sensitive `.env` files and deployed the entir
 3. **Admin Panel**: For hospital staff to verify doctor credentials.
 
 ---
-**Prepared by**: [Your Name/Team]
+**Prepared by**: [Imran Bhat/]
 **Date**: April 2026
