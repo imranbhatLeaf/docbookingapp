@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,12 +18,14 @@ export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) });
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/dashboard";
 
   const onSubmit = async (data) => {
     try {
       await login(data.email, data.password);
       toast.success("Logged in successfully");
-      navigate("/dashboard");
+      navigate(from, { replace: true });
     } catch (err) {
       toast.error("Login failed", {
         description: err.response?.data?.message || "Invalid credentials",
@@ -51,11 +53,21 @@ export default function Login() {
               {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-2">
+          <CardFooter className="flex flex-col gap-3">
             <Button type="submit" className="w-full">Login</Button>
-            <p className="text-sm text-muted-foreground">
-              Don't have an account? <Link to="/register" className="text-primary">Register</Link>
-            </p>
+            <div className="text-center w-full">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account? <Link to="/register" className="text-primary hover:underline">Register</Link>
+              </p>
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-sm text-muted-foreground">
+                  Are you a doctor? <Link to="/doctor/login" className="text-primary font-medium hover:underline">Sign in to Dashboard</Link>
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Or <Link to="/doctor/register" className="text-primary hover:underline">apply as a new doctor</Link>
+                </p>
+              </div>
+            </div>
           </CardFooter>
         </form>
       </Card>

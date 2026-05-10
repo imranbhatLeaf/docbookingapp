@@ -1,21 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
+const supabase = require('../db/supabase');
+const auth = require('../middleware/auth');
 
-// Mock user profile controller function
+// Get user profile
 const getUserProfile = async (req, res) => {
   try {
-    // Scaffold: Fetch user from DB
-    // const user = await pool.query('SELECT id, name, email, role FROM users WHERE id = $1', [req.user.id]);
-    // res.json(user.rows[0]);
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, name, email, role')
+      .eq('id', req.user.id)
+      .single();
 
-    // For now, return mock profile
-    res.json({ id: req.user.id, name: 'Mock User', email: 'mock@example.com', role: 'patient' });
+    if (error) throw error;
+    res.json(user);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server Error' });
   }
 };
 
-router.route('/profile').get(protect, getUserProfile);
+router.route('/profile').get(auth, getUserProfile);
 
 module.exports = router;

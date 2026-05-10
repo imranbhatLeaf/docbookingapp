@@ -1,5 +1,5 @@
 const express = require('express');
-const pool = require('../db/pool');
+const supabase = require('../db/supabase');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
@@ -16,22 +16,30 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        // Optional: check if slot is already taken (simple version)
-        const conflict = await pool.query(
-            'SELECT * FROM appointments WHERE doctor_id = $1 AND date = $2 AND time = $3',
-            [doctorId, date, time]
-        );
-        if (conflict.rows.length > 0) {
+        // Optional: check if slot is already taken
+        const { data: conflict, error: conflictError } = await supabase
+            .from('appointments')
+            .select('*')
+            .eq('doctor_id', doctorId)
+            .eq('date', date)
+            .eq('time', time);
+
+        if (conflictError) throw conflictError;
+        
+        if (conflict && conflict.length > 0) {
             return res.status(409).json({ message: 'Time slot already booked' });
         }
 
-        const result = await pool.query(
-            `INSERT INTO appointments (patient_id, doctor_id, date, time, status)
-             VALUES ($1, $2, $3, $4, 'confirmed')
-             RETURNING *`,
-            [patientId, doctorId, date, time]
-        );
-        res.status(201).json(result.rows[0]);
+        const { data, error } = await supabase
+            .from('appointments')
+            .insert([
+                { patient_id: patientId, doctor_id: doctorId, date, time, status: 'confirmed' }
+            ])
+            .select()
+            .single();
+
+        if (error) throw error;
+        res.status(201).json(data);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
@@ -42,15 +50,29 @@ router.post('/', async (req, res) => {
 router.get('/my', async (req, res) => {
     const patientId = req.user.id;
     try {
-        const result = await pool.query(
-            `SELECT a.*, d.name as doctor_name, d.specialty 
-             FROM appointments a
-             JOIN doctors d ON a.doctor_id = d.id
-             WHERE a.patient_id = $1
-             ORDER BY a.date DESC, a.time DESC`,
-            [patientId]
-        );
-        res.json(result.rows);
+        const { data, error } = await supabase
+            .from('appointments')
+            .select(`
+                *,
+                doctors (
+                    name,
+                    specialty
+                )
+            `)
+            .eq('patient_id', patientId)
+            .order('date', { ascending: false })
+            .order('time', { ascending: false });
+
+        if (error) throw error;
+
+        // Flatten the doctor details to maintain backward compatibility if needed
+        const formattedData = data.map(app => ({
+            ...app,
+            doctor_name: app.doctors?.name,
+            doctor_specialty: app.doctors?.specialty
+        }));
+
+        res.json(formattedData);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
@@ -63,11 +85,16 @@ router.delete('/:id', async (req, res) => {
     const patientId = req.user.id;
 
     try {
-        const result = await pool.query(
-            'DELETE FROM appointments WHERE id = $1 AND patient_id = $2 RETURNING *',
-            [appointmentId, patientId]
-        );
-        if (result.rows.length === 0) {
+        const { data, error } = await supabase
+            .from('appointments')
+            .delete()
+            .eq('id', appointmentId)
+            .eq('patient_id', patientId)
+            .select();
+
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
             return res.status(404).json({ message: 'Appointment not found or not yours' });
         }
         res.json({ message: 'Cancelled successfully' });
