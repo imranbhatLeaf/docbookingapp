@@ -111,7 +111,22 @@ export default function DoctorRegister() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="specialty">Medical Specialty</Label>
-                  <Input id="specialty" placeholder="Cardiology, Dermatology, etc." {...register("specialty")} />
+                  <select
+                    id="specialty"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
+                    {...register("specialty")}
+                  >
+                    <option value="">Select a specialty</option>
+                    <option value="General Physician">General Physician</option>
+                    <option value="Gynecologist">Gynecologist</option>
+                    <option value="Pediatrician">Pediatrician</option>
+                    <option value="Cardiologist">Cardiologist</option>
+                    <option value="Neurologist">Neurologist</option>
+                    <option value="Orthopedic">Orthopedic</option>
+                    <option value="Dermatologist">Dermatologist</option>
+                    <option value="Psychiatrist">Psychiatrist</option>
+                    <option value="Dentist">Dentist</option>
+                  </select>
                   {errors.specialty && <p className="text-sm text-destructive mt-1">{errors.specialty.message}</p>}
                 </div>
                 

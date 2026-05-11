@@ -3,6 +3,8 @@ const router = express.Router();
 const supabase = require('../db/supabase');
 const auth = require('../middleware/auth');
 
+const { submitFeedback } = require('../controllers/feedbackController');
+
 // Get user profile
 const getUserProfile = async (req, res) => {
   try {
@@ -21,5 +23,11 @@ const getUserProfile = async (req, res) => {
 };
 
 router.route('/profile').get(auth, getUserProfile);
+router.post('/feedback', (req, res, next) => {
+    // Optional auth: if token provided, attach user, else proceed as guest
+    auth(req, res, () => {
+        next();
+    });
+}, submitFeedback);
 
 module.exports = router;

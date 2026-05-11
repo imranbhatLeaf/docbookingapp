@@ -21,7 +21,7 @@ We used a relational database to ensure data integrity through Foreign Key const
 - **`users` Table**: Stores patient credentials and roles.
 - **`doctors` Table**: Stores professional details (specialty, experience, clinic address).
 - **`appointments` Table**: Links patients and doctors with specific dates and times.
-  - *Constraint*: `patient_id` references `users(id)`.
+  - *Constraint*: `user_id` references `users(id)`.
   - *Constraint*: `doctor_id` references `doctors(id)`.
 
 ---

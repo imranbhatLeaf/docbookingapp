@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Hero from "@/components/common/Hero";
+import FeedbackForm from "@/components/common/FeedbackForm";
 import { Search, CalendarCheck, UserRoundCheck, Stethoscope, Baby, Activity, Heart, Brain, Bone } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
@@ -41,7 +42,6 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-            
             <div className="flex flex-col items-center text-center space-y-4 group">
               <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner group-hover:bg-primary group-hover:text-white transition-all duration-300">
                 <Search className="h-10 w-10" />
@@ -127,6 +127,15 @@ export default function Home() {
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">User Rating</p>
             </div>
           </div>
+        </section>
+
+        {/* Feedback Section */}
+        <section className="mt-20 md:mt-32 py-12">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight mb-4">What Our Users Say</h2>
+            <p className="text-lg text-muted-foreground">We value your feedback and strive to improve our service.</p>
+          </div>
+          <FeedbackForm />
         </section>
 
         {/* Contact Section */}

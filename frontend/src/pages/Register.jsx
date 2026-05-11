@@ -119,7 +119,7 @@ export default function Register() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-col gap-2">
+          <CardFooter className="flex flex-col gap-2 text-center">
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Register"}
             </Button>
@@ -129,6 +129,17 @@ export default function Register() {
                 Login
               </Link>
             </p>
+            <div className="w-full mt-4 pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Are you a doctor?{" "}
+                <Link to="/doctor/register" className="text-primary font-medium hover:underline">
+                  Apply as a new doctor
+                </Link>
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Already approved? <Link to="/doctor/login" className="text-primary hover:underline">Sign in to Dashboard</Link>
+              </p>
+            </div>
           </CardFooter>
         </form>
       </Card>

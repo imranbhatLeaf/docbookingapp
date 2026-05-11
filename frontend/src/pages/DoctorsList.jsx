@@ -31,11 +31,11 @@ export default function DoctorsList() {
         // Transform backend fields to match DoctorCard props
         const transformed = response.data.map((doc) => ({
           id: doc.id,
-          name: doc.name,
-          specialty: doc.specialty,
-          experience: doc.experience,
-          location: doc.clinic_address,     // backend field → frontend
-          rating: doc.rating || (4 + Math.random() * 0.9).toFixed(1), // fallback if no rating column
+          name: doc.name || "Unknown Doctor",
+          specialty: doc.specialty || "General",
+          experience: doc.experience || "N/A",
+          location: doc.location || doc.clinic_address || "Not specified",
+          rating: doc.rating || (4 + Math.random() * 0.9).toFixed(1),
           verified: doc.verified !== undefined ? doc.verified : true,
         }));
         setDoctors(transformed);
@@ -49,8 +49,9 @@ export default function DoctorsList() {
   }, []);
 
   const filteredDoctors = doctors.filter((doc) => {
-    const matchesSearch = doc.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                          doc.location.toLowerCase().includes(filters.search.toLowerCase());
+    const searchLower = (filters.search || "").toLowerCase();
+    const matchesSearch = (doc.name || "").toLowerCase().includes(searchLower) ||
+                          (doc.location || "").toLowerCase().includes(searchLower);
     const matchesSpecialty = filters.specialty === "all" || doc.specialty === filters.specialty;
     return matchesSearch && matchesSpecialty;
   });

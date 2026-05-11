@@ -30,9 +30,9 @@ erDiagram
 
     APPOINTMENT {
         int id PK
-        int patient_id FK
+        int user_id FK
         int doctor_id FK
-        date date
+        date appointment_date
         time time
         string status
         timestamp created_at
@@ -45,6 +45,6 @@ erDiagram
 1.  **Users to Appointments (1:N)**: A single user (patient) can book multiple appointments over time, but each appointment is linked to exactly one user.
 2.  **Doctors to Appointments (1:N)**: A single doctor can have many appointments with different patients, but each appointment belongs to only one doctor.
 3.  **Appointment Constraints**: 
-    - The `patient_id` must exist in the `users` table.
+    - The `user_id` must exist in the `users` table.
     - The `doctor_id` must exist in the `doctors` table.
     - This ensures data integrity and prevents "ghost" appointments.

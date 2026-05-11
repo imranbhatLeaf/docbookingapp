@@ -13,22 +13,25 @@ CREATE TABLE IF NOT EXISTS users (
 -- 2. Doctors Table
 CREATE TABLE IF NOT EXISTS doctors (
     id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     specialty VARCHAR(100) NOT NULL,
     experience INTEGER,
     bio TEXT,
     education TEXT,
     clinic_address TEXT,
+    document_url TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 3. Appointments Table
 CREATE TABLE IF NOT EXISTS appointments (
     id SERIAL PRIMARY KEY,
-    patient_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     doctor_id INTEGER REFERENCES doctors(id) ON DELETE CASCADE,
-    date DATE NOT NULL,
+    appointment_date DATE NOT NULL,
     time TIME NOT NULL,
-    status VARCHAR(50) DEFAULT 'confirmed',
+    status VARCHAR(50) DEFAULT 'booked',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

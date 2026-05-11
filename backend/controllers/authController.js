@@ -4,6 +4,7 @@ const generateToken = require('../utils/generateToken');
 
 const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
+  console.log('Registration attempt for:', email);
 
   try {
     // Check if user exists
@@ -13,31 +14,43 @@ const registerUser = async (req, res) => {
       .eq('email', email)
       .maybeSingle();
 
-    if (checkError) throw checkError;
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
+    if (checkError) {
+      console.error('Check user existence error:', checkError);
+      throw checkError;
+    }
+    if (userExists) {
+      console.log('User already exists:', email);
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
     // Hash password
+    console.log('Hashing password...');
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insert into DB
+    console.log('Inserting into users table...');
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert([
         { name, email, password_hash: hashedPassword, role: role || 'patient' }
       ])
       .select('id, name, email, role')
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single to be safer
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error('Insert user error:', insertError);
+      throw insertError;
+    }
     
+    console.log('User registered successfully:', email);
     res.status(201).json({
       ...newUser,
       token: generateToken(newUser.id),
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Registration Catch Error:', error);
+    res.status(500).json({ message: error.message || error.details || 'Server Error' });
   }
 };
 

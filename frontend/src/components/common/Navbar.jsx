@@ -28,6 +28,11 @@ export default function Navbar() {
             </Button>
             {user ? (
               <>
+                {user.role === 'admin' && (
+                  <Button variant="ghost" size="sm" asChild className="text-primary font-bold">
+                    <Link to="/admin/dashboard">Admin Panel</Link>
+                  </Button>
+                )}
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/dashboard">Dashboard</Link>
                 </Button>

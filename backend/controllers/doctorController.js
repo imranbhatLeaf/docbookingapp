@@ -4,7 +4,7 @@ const getDoctors = async (req, res) => {
   try {
     const { data: doctors, error } = await supabase
       .from('doctors')
-      .select('id, name, specialty, location, availability')
+      .select('*')
       .eq('status', 'approved');
 
     if (error) throw error;
@@ -56,7 +56,7 @@ const applyForDoctor = async (req, res) => {
     res.status(201).json(doctor);
   } catch (error) {
     console.error('Error applying for doctor:', error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: error.message || error.details || 'Server Error' });
   }
 };
 

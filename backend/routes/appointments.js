@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
             .from('appointments')
             .select('*')
             .eq('doctor_id', doctorId)
-            .eq('date', date)
+            .eq('appointment_date', date)
             .eq('time', time);
 
         if (conflictError) throw conflictError;
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
         const { data, error } = await supabase
             .from('appointments')
             .insert([
-                { patient_id: patientId, doctor_id: doctorId, date, time, status: 'confirmed' }
+                { user_id: patientId, doctor_id: doctorId, appointment_date: date, time, status: 'confirmed' }
             ])
             .select()
             .single();
@@ -59,17 +59,18 @@ router.get('/my', async (req, res) => {
                     specialty
                 )
             `)
-            .eq('patient_id', patientId)
-            .order('date', { ascending: false })
+            .eq('user_id', patientId)
+            .order('appointment_date', { ascending: false })
             .order('time', { ascending: false });
 
         if (error) throw error;
 
-        // Flatten the doctor details to maintain backward compatibility if needed
+        // Flatten and format to match frontend expectations
         const formattedData = data.map(app => ({
             ...app,
-            doctor_name: app.doctors?.name,
-            doctor_specialty: app.doctors?.specialty
+            date: app.appointment_date,
+            doctorName: app.doctors?.name,
+            specialty: app.doctors?.specialty
         }));
 
         res.json(formattedData);
@@ -89,7 +90,7 @@ router.delete('/:id', async (req, res) => {
             .from('appointments')
             .delete()
             .eq('id', appointmentId)
-            .eq('patient_id', patientId)
+            .eq('user_id', patientId)
             .select();
 
         if (error) throw error;
